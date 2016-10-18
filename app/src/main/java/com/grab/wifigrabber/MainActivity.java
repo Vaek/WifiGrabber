@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop()
+    protected void onDestroy()
     {
         super.onStop();
         updater.stop(); // při ukončován aplikace zastavíme update vlákno a chytání eventů z wifi handleru

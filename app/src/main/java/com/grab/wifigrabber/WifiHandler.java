@@ -15,10 +15,10 @@ import java.util.List;
  */
 public class WifiHandler
 {
-    WifiManager manager;
-    List<ScanResult> results;
-    Context context;
-    BroadcastReceiver reciever;
+    private WifiManager manager;
+    private List<ScanResult> results;
+    private Context context;
+    private BroadcastReceiver reciever;
 
     public WifiHandler(Context context)
     {
@@ -47,7 +47,7 @@ public class WifiHandler
 
     /**
      * Vrací list výsledků posledního scanu
-     * @return
+     * @return list vysledků
      */
     public List<ScanResult> getWifiInfo()
     {
@@ -65,11 +65,14 @@ public class WifiHandler
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = "\"" + SSID + "\"";
 
+        System.out.println(getSecurityType(SSID));
         switch(getSecurityType(SSID)) // naplníme konfiguraci podle typu zabezpečení
         {
             case WEP:
                 conf.wepKeys[0] = password;
                 conf.wepTxKeyIndex = 0;
+                conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+                conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
                 break;
             case WPA:
                 conf.preSharedKey = "\"" + password + "\"";
@@ -79,15 +82,20 @@ public class WifiHandler
         }
 
         int netId = manager.addNetwork(conf);
-
+        System.out.println(netId);
         if(netId != -1) // odpojíme stávající sít, a poté připojíme novou
         {
+            for(WifiConfiguration con : manager.getConfiguredNetworks())
+            {
+                manager.disableNetwork(con.networkId);
+            }
+
             manager.disconnect();
             manager.enableNetwork(netId, true);
             manager.reconnect();
             return true;
         }
-
+        System.out.println("FAil");
         return false;
     }
 
@@ -131,4 +139,4 @@ enum SecurityType
     WEP,
     WPA,
     NONE
-};
+}
