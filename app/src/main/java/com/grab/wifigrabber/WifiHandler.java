@@ -65,7 +65,6 @@ public class WifiHandler
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = "\"" + SSID + "\"";
 
-        System.out.println(getSecurityType(SSID));
         switch(getSecurityType(SSID)) // naplníme konfiguraci podle typu zabezpečení
         {
             case WEP:
@@ -82,10 +81,10 @@ public class WifiHandler
         }
 
         int netId = manager.addNetwork(conf);
-        System.out.println(netId);
+
         if(netId != -1) // odpojíme stávající sít, a poté připojíme novou
         {
-            for(WifiConfiguration con : manager.getConfiguredNetworks())
+            for(WifiConfiguration con : manager.getConfiguredNetworks()) // vyřadíme z provozu ostatní zapamatované sítě
             {
                 manager.disableNetwork(con.networkId);
             }
@@ -95,7 +94,6 @@ public class WifiHandler
             manager.reconnect();
             return true;
         }
-        System.out.println("FAil");
         return false;
     }
 
